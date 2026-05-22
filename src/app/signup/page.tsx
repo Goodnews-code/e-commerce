@@ -8,6 +8,7 @@ export default function SignUpPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,12 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -33,7 +40,7 @@ export default function SignUpPage() {
         return;
       }
 
-      setSuccess("Account created successfully! Redirecting to sign in...");
+      setSuccess("Account created! Redirecting to sign in...");
       setTimeout(() => {
         router.push("/login");
       }, 2000);
@@ -183,6 +190,37 @@ export default function SignUpPage() {
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              style={{ 
+                width: "100%",
+                padding: "12px 16px", 
+                border: "1px solid var(--border)", 
+                borderRadius: "2px", 
+                background: "var(--bg-surface)", 
+                color: "var(--text-primary)",
+                fontSize: "14px",
+                fontFamily: "inherit"
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ 
+              display: "block", 
+              fontSize: "12px", 
+              color: "var(--text-secondary)",
+              marginBottom: "6px",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase"
+            }}>
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={loading}
               style={{ 
