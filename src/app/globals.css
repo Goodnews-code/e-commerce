@@ -52,8 +52,8 @@
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
-  --font-sans: "Montserrat", system-ui, sans-serif;
-  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-display: var(--font-display), Georgia, serif;
 }
 
 /* ─── Base ───────────────────────────────────────────────── */
@@ -304,11 +304,14 @@ body {
 }
 
 /* ─── Responsive Adjustments ────────────────────────────────────── */
-@media (max-width: 640px) {
+.header-container {
+  height: 80px;
+}
 
-  /* Reduce header height on small screens */
-  header {
-    height: 60px !important;
+@media (max-width: 768px) {
+  .header-container {
+    height: 60px;
+    padding: 0 20px !important;
   }
 
   /* Smaller button padding and font size */
@@ -326,6 +329,36 @@ body {
   /* Slightly tighter card borders */
   .glass-card {
     border-radius: 2px;
+  }
+}
+
+.mobile-nav-menu {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 60px);
+  background: var(--bg-base);
+  z-index: 49;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 24px 32px 24px;
+  gap: 24px;
+  border-top: 1px solid var(--border);
+  animation: cinematicFadeIn 0.3s ease-out both;
+}
+
+/* Staggered mobile nav links slide-in */
+.mobile-nav-link {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: mobileLinkSlideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mobileLinkSlideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

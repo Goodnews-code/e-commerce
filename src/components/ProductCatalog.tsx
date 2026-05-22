@@ -19,14 +19,23 @@ export default function ProductCatalog() {
   const [loading, setLoading]     = useState(true);
 
   const [search, setSearch]       = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory]   = useState("All");
   const [sort, setSort]           = useState("");
+
+  // Debounce search query changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (category !== "All") params.set("category", category);
-    if (search)             params.set("search",   search);
+    if (debouncedSearch)    params.set("search",   debouncedSearch);
     if (sort)               params.set("sort",     sort);
 
     const res  = await fetch(`/api/products?${params.toString()}`);
@@ -35,11 +44,10 @@ export default function ProductCatalog() {
     setCategories(data.categories);
     setTotal(data.total);
     setLoading(false);
-  }, [category, search, sort]);
+  }, [category, debouncedSearch, sort]);
 
   useEffect(() => {
-    const timer = setTimeout(() => fetchProducts(), 300);
-    return () => clearTimeout(timer);
+    fetchProducts();
   }, [fetchProducts]);
 
   return (

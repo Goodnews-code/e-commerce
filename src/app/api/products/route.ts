@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
   }
 
   const countResult = await query(
-    `SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.id ${where}`,
+    `SELECT COUNT(*) as count FROM products p LEFT JOIN categories c ON p.category_id = c.id ${where}`,
     params
   );
   const total = parseInt(countResult.rows[0].count);
