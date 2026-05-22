@@ -3,6 +3,22 @@ import type { NextRequest } from "next/server";
 import { query } from "@/lib/db";
 import { authenticate } from "@/lib/auth";
 
+interface DbProductRow {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  category_id: number;
+  category_name: string;
+  category_slug: string;
+  rating: number;
+  reviews: number;
+  tags: string | string[];
+  in_stock: number | boolean;
+  created_at: string;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
@@ -13,7 +29,7 @@ export async function GET(request: NextRequest) {
   const offset = (page - 1) * limit;
 
   let where = "WHERE 1=1";
-  const params: any[] = [];
+  const params: unknown[] = [];
 
   if (category && category !== "All") {
     where += " AND c.slug = ?";
@@ -46,7 +62,7 @@ export async function GET(request: NextRequest) {
 
   const categoriesResult = await query("SELECT name, slug FROM categories");
 
-  const products = result.rows.map((p: any) => ({
+  const products = (result.rows as DbProductRow[]).map((p) => ({
     ...p,
     tags: typeof p.tags === 'string' ? JSON.parse(p.tags) : p.tags || [],
   }));
@@ -56,7 +72,7 @@ export async function GET(request: NextRequest) {
     total,
     page,
     limit,
-    categories: ["All", ...categoriesResult.rows.map((c: any) => c.slug)],
+    categories: ["All", ...categoriesResult.rows.map((c: { slug: string }) => c.slug)],
   });
 }
 
@@ -77,5 +93,6 @@ export async function POST(request: NextRequest) {
     [name, description, price, image_url, catResult.rows[0].id, JSON.stringify(tags || [])]
   );
 
-  return NextResponse.json(result.rows[0], { status: 201 });
+  const resultRows = result.rows as { id: number }[];
+  return NextResponse.json(resultRows[0], { status: 201 });
 }

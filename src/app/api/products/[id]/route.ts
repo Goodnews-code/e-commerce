@@ -8,7 +8,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const result = await query(
     `SELECT p.*, c.name as category_name, c.slug as category_slug
      FROM products p LEFT JOIN categories c ON p.category_id = c.id
-     WHERE p.id = $1`,
+     WHERE p.id = ?`,
     [id]
   );
 
@@ -28,20 +28,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   let categoryId = null;
   if (category) {
-    const catResult = await query("SELECT id FROM categories WHERE slug = $1", [category]);
+    const catResult = await query("SELECT id FROM categories WHERE slug = ?", [category]);
     if (catResult.rows.length > 0) categoryId = catResult.rows[0].id;
   }
 
   const result = await query(
     `UPDATE products SET
-      name = COALESCE($1, name),
-      description = COALESCE($2, description),
-      price = COALESCE($3, price),
-      image_url = COALESCE($4, image_url),
-      category_id = COALESCE($5, category_id),
-      tags = COALESCE($6, tags),
-      in_stock = COALESCE($7, in_stock)
-     WHERE id = $8 RETURNING *`,
+      name = COALESCE(?, name),
+      description = COALESCE(?, description),
+      price = COALESCE(?, price),
+      image_url = COALESCE(?, image_url),
+      category_id = COALESCE(?, category_id),
+      tags = COALESCE(?, tags),
+      in_stock = COALESCE(?, in_stock)
+     WHERE id = ? RETURNING *`,
     [name, description, price, image_url, categoryId, tags, in_stock, id]
   );
 
@@ -57,7 +57,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   const auth = await authenticate(request);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const result = await query("DELETE FROM products WHERE id = $1 RETURNING id", [id]);
+  const result = await query("DELETE FROM products WHERE id = ? RETURNING id", [id]);
 
   if (result.rows.length === 0) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });

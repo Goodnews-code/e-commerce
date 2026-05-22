@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
-  const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -39,8 +38,8 @@ export default function CheckoutPage() {
       const data = await res.json();
       clearCart();
       router.push(`/order-confirmation?id=${data.orderId}`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Checkout failed");
     } finally {
       setLoading(false);
     }

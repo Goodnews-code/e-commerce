@@ -1,25 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
+    setLoading(true);
+
     try {
-      await login(username, password);
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Registration failed");
+        setLoading(false);
+        return;
+      }
+
+      setSuccess("Account created successfully! Redirecting to sign in...");
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch {
+      setError("A network error occurred. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -53,7 +73,7 @@ export default function LoginPage() {
           marginBottom: "32px",
           fontWeight: 300
         }}>
-          Sign in to access the collection
+          Create an account to join the collection
         </p>
 
         {error && (
@@ -67,6 +87,20 @@ export default function LoginPage() {
             color: "#ff6b6b"
           }}>
             {error}
+          </div>
+        )}
+
+        {success && (
+          <div style={{ 
+            padding: "12px", 
+            background: "rgba(212,175,55,0.1)", 
+            border: "1px solid var(--accent)",
+            borderRadius: "2px",
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "var(--accent)"
+          }}>
+            {success}
           </div>
         )}
 
@@ -88,6 +122,38 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              disabled={loading}
+              style={{ 
+                width: "100%",
+                padding: "12px 16px", 
+                border: "1px solid var(--border)", 
+                borderRadius: "2px", 
+                background: "var(--bg-surface)", 
+                color: "var(--text-primary)",
+                fontSize: "14px",
+                fontFamily: "inherit"
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ 
+              display: "block", 
+              fontSize: "12px", 
+              color: "var(--text-secondary)",
+              marginBottom: "6px",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase"
+            }}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              placeholder="Enter email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
               style={{ 
                 width: "100%",
                 padding: "12px 16px", 
@@ -114,10 +180,11 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
-              placeholder="Enter password"
+              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
               style={{ 
                 width: "100%",
                 padding: "12px 16px", 
@@ -134,13 +201,16 @@ export default function LoginPage() {
           <button 
             type="submit" 
             className="btn-primary" 
+            disabled={loading}
             style={{ 
               width: "100%",
               marginTop: "8px",
-              justifyContent: "center"
+              justifyContent: "center",
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer"
             }}
           >
-            Sign In
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
@@ -150,9 +220,9 @@ export default function LoginPage() {
           fontSize: "13px", 
           color: "var(--text-muted)" 
         }}>
-          Don't have an account?{" "}
-          <Link href="/signup" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
-            Sign Up
+          Already have an account?{" "}
+          <Link href="/login" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
+            Sign In
           </Link>
         </p>
       </div>

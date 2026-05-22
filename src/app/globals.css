@@ -333,3 +333,17 @@ body {
 .font-display {
   font-family: var(--font-display);
 }
+
+/* ─── Product Card Link Hover Effects ─────────────────────── */
+.product-card-link {
+  transition: opacity 0.3s ease;
+}
+.product-card-link:hover {
+  opacity: 0.95;
+}
+.product-card-link:hover .product-title {
+  color: var(--accent) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}

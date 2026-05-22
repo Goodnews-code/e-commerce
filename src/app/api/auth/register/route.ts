@@ -9,18 +9,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'All fields required' }, { status: 400 });
   }
 
-  const existing = await query('SELECT id FROM users WHERE username = $1 OR email = $2', [username, email]);
+  const existing = await query('SELECT id FROM users WHERE username = ? OR email = ?', [username, email]);
   if (existing.rows.length > 0) {
     return NextResponse.json({ error: 'User already exists' }, { status: 409 });
   }
 
   const hash = hashPassword(password);
   const result = await query(
-    'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username',
+    'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?) RETURNING id, username',
     [username, email, hash]
   );
 
-  const user = result.rows[0] as any;
+  const user = result.rows[0] as { id: number; username: string };
   const token = signToken({ userId: user.id, username: user.username });
 
   const response = NextResponse.json({ token, user: { id: user.id, username: user.username, email } });

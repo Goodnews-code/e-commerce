@@ -2,12 +2,14 @@
 
 import ThemeToggle from "./ThemeToggle";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const { totalItems } = useCart();
+  const pathname = usePathname();
 
   return (
     <header
@@ -53,31 +55,38 @@ export default function Header() {
         {/* Nav */}
         <nav style={{ display: "flex", alignItems: "center", gap: "24px" }}>
           {[
-            { label: "Objects", href: "/", active: true },
-            { label: "Spaces", href: "/spaces", active: false },
-            { label: "Journal", href: "/journal", active: false },
-            ...(user ? [] : [{ label: "Login", href: "/login", active: false }]),
-            ...(user ? [{ label: "Logout", href: "#", active: false }] : []),
-          ].map(({ label, href, active }) => (
-            <Link
-              key={label}
-              href={href}
-              onClick={label === "Logout" ? (e) => { e.preventDefault(); logout(); } : undefined}
-              style={{
-                color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                fontWeight: active ? 500 : 400,
-                fontSize: "12px",
-                textDecoration: "none",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                transition: "color 0.5s ease-out",
-                borderBottom: active ? "1px solid var(--text-primary)" : "1px solid transparent",
-                paddingBottom: "4px"
-              }}
-            >
-              {label}
-            </Link>
-          ))}
+            { label: "Objects", href: "/" },
+            { label: "Spaces", href: "/spaces" },
+            { label: "Journal", href: "/journal" },
+            ...(user ? [{ label: "Profile", href: "/profile" }] : []),
+            ...(user ? [] : [
+              { label: "Login", href: "/login" },
+              { label: "Sign Up", href: "/signup" }
+            ]),
+            ...(user ? [{ label: "Logout", href: "#" }] : []),
+          ].map(({ label, href }) => {
+            const active = pathname === href;
+            return (
+              <Link
+                key={label}
+                href={href}
+                onClick={label === "Logout" ? (e) => { e.preventDefault(); logout(); } : undefined}
+                style={{
+                  color: active ? "var(--text-primary)" : "var(--text-secondary)",
+                  fontWeight: active ? 500 : 400,
+                  fontSize: "12px",
+                  textDecoration: "none",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  transition: "color 0.5s ease-out",
+                  borderBottom: active ? "1px solid var(--text-primary)" : "1px solid transparent",
+                  paddingBottom: "4px"
+                }}
+              >
+                {label}
+              </Link>
+            );
+          })}
           {user && (
             <span style={{ fontSize: "12px", color: "var(--text-muted)", textTransform: "uppercase" }}>
               {user.username}

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       const orderResult = await query(
         "INSERT INTO orders (user_id, total, status) VALUES (?, ?, ?)",
         [auth.userId, total, "pending"]
-      ) as any;
+      ) as { rows: { id: number }[] };
 
       const orderId = orderResult.rows[0].id;
 
@@ -44,9 +44,10 @@ export async function POST(request: NextRequest) {
       rollbackTransaction();
       throw err;
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : "Failed to create order";
     console.error("Order creation error:", error);
-    return NextResponse.json({ error: error.message || "Failed to create order" }, { status: 500 });
+    return NextResponse.json({ error: errorMsg }, { status: 500 });
   }
 }
 
@@ -59,5 +60,20 @@ export async function GET(request: NextRequest) {
     [auth.userId]
   );
 
-  return NextResponse.json({ orders: result.rows });
+  const orders = [];
+  for (const order of result.rows) {
+    const itemsResult = await query(
+      `SELECT oi.id, oi.quantity, oi.price, p.name as product_name, p.image_url
+       FROM order_items oi
+       LEFT JOIN products p ON oi.product_id = p.id
+       WHERE oi.order_id = ?`,
+      [order.id]
+    );
+    orders.push({
+      ...order,
+      items: itemsResult.rows,
+    });
+  }
+
+  return NextResponse.json({ orders });
 }

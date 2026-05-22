@@ -5,11 +5,11 @@ const dbPath = path.join(process.cwd(), 'aura.db');
 const db = new Database(dbPath);
 
 export const query = (text: string, params: any[] = []): any => {
-  const isSelect = text.trim().toUpperCase().startsWith('SELECT');
-  if (isSelect) {
-    return { rows: db.prepare(text).all(...params) };
+  const stmt = db.prepare(text);
+  if (stmt.reader) {
+    return { rows: stmt.all(...params) };
   }
-  const result = db.prepare(text).run(...params);
+  const result = stmt.run(...params);
   return {
     rows: [{ id: result.lastInsertRowid }],
     rowCount: result.changes,

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const user = result.rows[0] as any;
+    const user = result.rows[0] as { id: number; username: string; email: string; password_hash: string };
     if (!comparePassword(password, user.password_hash)) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
@@ -24,9 +24,10 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ token, user: { id: user.id, username: user.username, email: user.email } });
     response.cookies.set('auth', token, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 * 7 });
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : 'Internal server error';
     console.error('Login error:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: errorMsg }, { status: 500 });
   }
 }
 
