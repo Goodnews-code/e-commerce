@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     [username, email, hash]
   );
 
-  const user = result.rows[0];
+  const user = result.rows[0] as any;
   const token = signToken({ userId: user.id, username: user.username });
 
   const response = NextResponse.json({ token, user: { id: user.id, username: user.username, email } });

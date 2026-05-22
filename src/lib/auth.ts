@@ -14,7 +14,7 @@ export function comparePassword(password: string, hash: string): boolean {
 }
 
 export function signToken(payload: { userId: number; username: string }): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN as any });
 }
 
 export function verifyToken(token: string): any {

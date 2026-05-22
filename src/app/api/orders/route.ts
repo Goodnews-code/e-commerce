@@ -18,16 +18,16 @@ export async function POST(request: NextRequest) {
 
     try {
       // Create order
-      const orderResult = query(
+      const orderResult = await query(
         "INSERT INTO orders (user_id, total, status) VALUES (?, ?, ?)",
         [auth.userId, total, "pending"]
-      );
+      ) as any;
 
       const orderId = orderResult.rows[0].id;
 
       // Insert order items
       for (const item of items) {
-        query(
+        await query(
           "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)",
           [orderId, item.id, item.quantity, item.price]
         );

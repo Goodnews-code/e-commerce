@@ -4,7 +4,7 @@ import path from 'path';
 const dbPath = path.join(process.cwd(), 'aura.db');
 const db = new Database(dbPath);
 
-export const query = (text: string, params: any[] = []) => {
+export const query = (text: string, params: any[] = []): any => {
   const isSelect = text.trim().toUpperCase().startsWith('SELECT');
   if (isSelect) {
     return { rows: db.prepare(text).all(...params) };
@@ -16,7 +16,7 @@ export const query = (text: string, params: any[] = []) => {
   };
 };
 
-export const queryOne = (text: string, params: any[] = []) => {
+export const queryOne = (text: string, params: any[] = []): any => {
   return db.prepare(text).get(...params);
 };
 

@@ -3,12 +3,13 @@ import type { NextRequest } from "next/server";
 import { query } from "@/lib/db";
 import { authenticate } from "@/lib/auth";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const result = await query(
     `SELECT p.*, c.name as category_name, c.slug as category_slug
      FROM products p LEFT JOIN categories c ON p.category_id = c.id
      WHERE p.id = $1`,
-    [params.id]
+    [id]
   );
 
   if (result.rows.length === 0) {
@@ -18,7 +19,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   return NextResponse.json(result.rows[0]);
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const auth = await authenticate(request);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -40,7 +42,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       tags = COALESCE($6, tags),
       in_stock = COALESCE($7, in_stock)
      WHERE id = $8 RETURNING *`,
-    [name, description, price, image_url, categoryId, tags, in_stock, params.id]
+    [name, description, price, image_url, categoryId, tags, in_stock, id]
   );
 
   if (result.rows.length === 0) {
@@ -50,11 +52,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   return NextResponse.json(result.rows[0]);
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const auth = await authenticate(request);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const result = await query("DELETE FROM products WHERE id = $1 RETURNING id", [params.id]);
+  const result = await query("DELETE FROM products WHERE id = $1 RETURNING id", [id]);
 
   if (result.rows.length === 0) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
