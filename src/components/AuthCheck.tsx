@@ -9,11 +9,15 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const publicRoutes = ["/", "/spaces", "/journal", "/cart", "/login", "/signup", "/register"];
+  const isProductRoute = pathname.startsWith("/products/");
+  const isPublicRoute = publicRoutes.includes(pathname) || isProductRoute;
+
   useEffect(() => {
-    if (!loading && !user && pathname !== "/login") {
+    if (!loading && !user && !isPublicRoute) {
       router.push("/login");
     }
-  }, [user, loading, pathname, router]);
+  }, [user, loading, pathname, isPublicRoute, router]);
 
   if (loading) {
     return (
@@ -29,7 +33,7 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (pathname === "/login") {
+  if (isPublicRoute) {
     return <>{children}</>;
   }
 
