@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AURA — Essential Objects
 
-## Getting Started
+> *A curation of essential objects. Stripped of the unnecessary, built for endurance, and designed for absolute focus.*
 
-First, run the development server:
+AURA is a full-stack minimalist luxury e-commerce platform built around the philosophy of **quiet luxury**. It offers a handpicked collection of essential objects across multiple categories — each selected for quality, endurance, and intentional design. The interface is intentionally understated, letting the products speak for themselves.
+
+---
+
+## ✨ Features
+
+- 🔍 **Real-time search & filtering** — Instant product search with category filters and sort options
+- 🛒 **Persistent cart** — Add items and manage your cart with live item count in the header
+- 🔐 **Secure authentication** — JWT-based Sign Up / Login with bcrypt password hashing
+- 📦 **Order management** — Checkout flow with order confirmation
+- 🌙 **Dark / Light mode** — Theme toggle with zero flash on page load
+- 📱 **Fully responsive** — Premium mobile navigation with staggered animations and scroll lock
+- ⚡ **Performance-first** — Self-hosted fonts via `next/font`, debounced search, optimized SQL queries
+- 🎨 **Understated Luxury design** — Champagne gold accents, Playfair Display serifs, cinematic animations
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 + Vanilla CSS |
+| Database | SQLite via `better-sqlite3` |
+| Auth | JWT (`jsonwebtoken`) + `bcryptjs` |
+| Fonts | Inter + Playfair Display via `next/font/google` |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Goodnews-code/e-commerce.git
+cd e-commerce
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up environment variables
+
+Copy the example env file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+```env
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=7d
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Initialize and seed the database
+
+```bash
+npm run db:init
+npm run db:seed
+```
+
+### 5. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔑 Default Credentials
 
-## Learn More
+After seeding, a demo account is available:
 
-To learn more about Next.js, take a look at the following resources:
+| Field | Value |
+|---|---|
+| Username | `demo` |
+| Password | `password123` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── api/              # REST API routes (products, auth, orders)
+│   ├── cart/             # Cart page
+│   ├── checkout/         # Checkout page (auth required)
+│   ├── login/            # Login page
+│   ├── signup/           # Sign up page
+│   ├── profile/          # User profile (auth required)
+│   ├── spaces/           # Spaces collection page
+│   ├── journal/          # Journal page
+│   ├── globals.css       # Global styles & design tokens
+│   └── layout.tsx        # Root layout with providers
+├── components/
+│   ├── Header.tsx        # Responsive navigation header
+│   ├── ProductCard.tsx   # Individual product card
+│   ├── ProductCatalog.tsx # Product grid with search & filters
+│   ├── AuthCheck.tsx     # Route protection wrapper
+│   └── ThemeToggle.tsx   # Dark/light mode toggle
+├── lib/
+│   ├── db.ts             # SQLite database connection & query helper
+│   ├── auth.ts           # JWT authentication utilities
+│   ├── auth-context.tsx  # React auth context provider
+│   ├── cart-context.tsx  # React cart context provider
+│   ├── init-db.ts        # Database schema initializer
+│   └── seed-db.ts        # Database seeder
+└── types/
+    └── product.ts        # TypeScript type definitions
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📜 Available Scripts
+
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run start      # Start production server
+npm run lint       # Run ESLint
+npm run db:init    # Initialize database schema
+npm run db:seed    # Seed database with sample data
+```
+
+---
+
+## 🔒 Route Protection
+
+| Route | Access |
+|---|---|
+| `/`, `/spaces`, `/journal`, `/cart` | Public — no login required |
+| `/checkout`, `/profile` | Protected — redirects to `/login` |
+
+---
+
+## 🌐 Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions including environment variables, SQLite persistence considerations, and production build steps.
+
+> ⚠️ **Note:** SQLite is ephemeral on serverless platforms (Vercel, Netlify). For persistent production storage, consider migrating to [Turso](https://turso.tech) or [Neon](https://neon.tech) PostgreSQL.
+
+---
+
+## 📄 License
+
+MIT — free to use, modify, and distribute.
+
+---
+
+<p align="center">
+  Built with precision. Designed with restraint. &nbsp;·&nbsp; <strong>AURA</strong>
+</p>
